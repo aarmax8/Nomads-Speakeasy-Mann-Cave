@@ -1,0 +1,14 @@
+{
+  "name": "Nomads Mann Cave",
+  "short_name": "Mann Cave",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0b0c",
+  "theme_color": "#0e120c",
+  "icons": [
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
