@@ -95,14 +95,14 @@
     .drink-card[data-is-barcode="true"] .drink-card-front { background-color: #0c0a08; border: 2px solid #d4af37; box-shadow: 0 8px 24px rgba(0,0,0,0.8); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 1.25rem; gap: 0.75rem; }
     .drink-card[data-is-barcode="true"] img { width: 80%; border-radius: 0.5rem; object-fit: contain; max-height: 50%; border: 1px solid rgba(212,175,55,0.3); }
     #app-footer { position: relative; flex-shrink: 0; z-index: 50; padding-bottom: calc(env(safe-area-inset-bottom) * 0.6 + 6px); padding-top: 10px; min-height: calc(50px + 10px + (env(safe-area-inset-bottom) * 0.6)); box-sizing: border-box; background-color: rgba(15,15,15,0.6); border-top: 1px solid rgba(212,175,55,0.2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 -4px 15px rgba(0,0,0,0.6); display: flex; flex-direction: column; justify-content: center; align-items: center; width: 100%; margin: 0; }
-    #footer-content { width: 100%; max-width: 640px; display: flex; gap: 0.9rem; justify-content: center; align-items: center; padding: 0 1rem; box-sizing: border-box; }
+    #footer-content { width: 100%; max-width: 640px; display: flex; gap: 0.9rem; justify-content: center; align-items: center; padding: 4px 1rem 0; box-sizing: border-box; }
     .scrub-side { flex-shrink:0; width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:radial-gradient(circle at 50% 38%, #201a12 0%, #14100b 70%); border:2px solid #e2703a; box-shadow:0 2px 7px rgba(0,0,0,0.55), inset 0 0 0 3px #14100b, inset 0 0 0 4px #2fa79b; color:#3fc4b7; font-size:1.05rem; cursor:pointer; -webkit-tap-highlight-color:transparent; transition:transform .12s ease, box-shadow .15s ease; }
     .scrub-side:active { transform:scale(0.9); }
     .scrub-side:active i { color:#f2a36b; }
     .scrub-side i { filter:drop-shadow(0 1px 1px rgba(0,0,0,0.8)); }
-    .scrub-wrap { position:relative; flex:1; display:flex; align-items:center; min-width:0; height:44px; }
-    #card-scrub { -webkit-appearance:none; appearance:none; width:100%; height:10px; border-radius:999px; margin:0; background:linear-gradient(to right, #2fa79b 0%, #3fc4b7 45%, #e2703a 100%); border:1px solid rgba(0,0,0,0.4); box-shadow: inset 0 1px 2px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.08); outline:none; cursor:pointer; }
-    #card-scrub::-webkit-slider-thumb { -webkit-appearance:none; width:42px; height:42px; margin-top:-17px; border:none; border-radius:50%; background:var(--bike-thumb) center center / contain no-repeat; cursor:grab; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7)); }
+    .scrub-wrap { position:relative; flex:1; display:flex; align-items:center; min-width:0; height:46px; }
+    #card-scrub { -webkit-appearance:none; appearance:none; display:block; align-self:center; width:100%; height:10px; border-radius:999px; margin:0; padding:0; vertical-align:middle; background:linear-gradient(to right, #2fa79b 0%, #3fc4b7 45%, #e2703a 100%); border:1px solid rgba(0,0,0,0.4); box-shadow: inset 0 1px 2px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.08); outline:none; cursor:pointer; }
+    #card-scrub::-webkit-slider-thumb { -webkit-appearance:none; width:42px; height:42px; margin-top:-16px; border:none; border-radius:50%; background:var(--bike-thumb) center center / contain no-repeat; cursor:grab; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.7)); }
     #card-scrub::-webkit-slider-thumb:active { cursor:grabbing; }
     #card-scrub::-moz-range-thumb { width:42px; height:42px; border:none; border-radius:50%; background:var(--bike-thumb) center center / contain no-repeat; cursor:grab; }
     #card-scrub::-moz-range-track { height:10px; border-radius:999px; background:linear-gradient(to right, #2fa79b, #e2703a); }
@@ -427,6 +427,9 @@ document.getElementById('action-favorites-btn').onclick=()=>{ renderFavorites();
 const RANK_VAL={"2":2,"3":3,"4":4,"5":5,"6":6,"7":7,"8":8,"9":9,"10":10,"J":11,"Q":12,"K":13,"A":14};
 const RANK_WORD={"A":"Ace","2":"Two","3":"Three","4":"Four","5":"Five","6":"Six","7":"Seven","8":"Eight","9":"Nine","10":"Ten","J":"Jack","Q":"Queen","K":"King"};
 function plural(w){ return w==="Six"?"Sixes":w+"s"; }
+function combos5(a){ const r=[],n=a.length; for(let i=0;i<n-4;i++)for(let j=i+1;j<n-3;j++)for(let k=j+1;k<n-2;k++)for(let l=k+1;l<n-1;l++)for(let m=l+1;m<n;m++)r.push([a[i],a[j],a[k],a[l],a[m]]); return r; }
+function rank5(cards){ const vs=cards.map(c=>c.v).sort((x,y)=>y-x); const cnt={}; cards.forEach(c=>cnt[c.v]=(cnt[c.v]||0)+1); const groups=Object.keys(cnt).map(v=>[+v,cnt[v]]).sort((a,b)=> b[1]-a[1] || b[0]-a[0]); const flush=cards.every(c=>c.suitKey===cards[0].suitKey); const uniq=[...new Set(vs)]; let sHigh=0; if(uniq.length===5){ if(vs[0]-vs[4]===4)sHigh=vs[0]; else if(vs.join(',')==='14,5,4,3,2')sHigh=5; } let cat; if(sHigh&&flush)cat=(sHigh===14?9:8); else if(groups[0][1]===4)cat=7; else if(groups[0][1]===3&&groups[1]&&groups[1][1]===2)cat=6; else if(flush)cat=5; else if(sHigh)cat=4; else if(groups[0][1]===3)cat=3; else if(groups[0][1]===2&&groups[1]&&groups[1][1]===2)cat=2; else if(groups[0][1]===2)cat=1; else cat=0; let tb; if(cat===4||cat===8||cat===9)tb=[sHigh,0,0,0,0]; else tb=groups.map(g=>g[0]).concat(vs).slice(0,5); let score=cat; for(let i=0;i<5;i++)score=score*15+((tb[i]||0)); return score; }
+function bestFive(cards){ if(cards.length<=5)return cards.slice(); let best=null,bs=-1; combos5(cards).forEach(c=>{ const s=rank5(c); if(s>bs){bs=s;best=c;} }); return best; }
 function evaluatePoker(cards){ const byV={}; cards.forEach(c=>{(byV[c.v]=byV[c.v]||[]).push(c);});
  const groups=Object.values(byV).sort((a,b)=> b.length-a.length || b[0].v-a[0].v);
  const flush=cards.every(c=>c.suitKey===cards[0].suitKey);
@@ -450,8 +453,9 @@ function drawReading(){ const el=document.getElementById('reading-content'); con
  const pool=MENU.filter(d=>{const m=CARD_MAP[d.name]; return m&&m[0]!=="JOKER";}).filter(isMakeable);
  if(pool.length<5){ el.innerHTML='<div class="find-empty">Not enough on the shelf for a hand \u2014 stock at least five drinks and deal again.</div>'; readingPour=null; if(go)go.style.display='none'; return; }
  const deck=pool.slice(); for(let i=deck.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=deck[i];deck[i]=deck[j];deck[j]=t; }
- const hand=deck.slice(0,5).map(d=>{ const m=cardMeta(d); return {d:d,rank:m.rank,suitKey:m.suitKey,suit:m.suit,red:m.red,v:RANK_VAL[m.rank]}; });
- hand.sort((a,b)=>b.v-a.v);
+ const draw=Math.min(7,deck.length);
+ const dealt=deck.slice(0,draw).map(d=>{ const m=cardMeta(d); return {d:d,rank:m.rank,suitKey:m.suitKey,suit:m.suit,red:m.red,v:RANK_VAL[m.rank]}; });
+ const hand=bestFive(dealt); hand.sort((a,b)=>b.v-a.v);
  const res=evaluatePoker(hand); readingPour=res.pick.d.name;
  const mini=c=>'<div class="rd-slot"><div class="rd-card"><div class="rd-rank'+(c.red?' is-red':'')+'">'+c.rank+c.suit+'</div><div class="rd-drink">'+c.d.name+'</div></div></div>';
  el.innerHTML='<div class="rd-spread rd-deal">'+hand.map(mini).join('')+'</div><div class="rd-hand">'+res.name+'</div><div class="rd-flavor">'+res.line+'</div><div class="rd-callout">The hand picks: '+res.pick.d.name+'</div>';
