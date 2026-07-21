@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Nomads">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="https://raw.githubusercontent.com/aarmax8/Nomads-Speakeasy-Mann-Cave/main/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,14 +33,14 @@
     .footer-btn:hover { background-color: rgba(212,175,55,0.10); border-color: rgba(212,175,55,0.22); }
     .footer-btn:hover i { transform: translateY(-1px); }
     .footer-btn:active { transform: scale(0.92); }
-    .carousel-view { display: flex; gap: 1.5rem; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scroll-padding: 1rem; -webkit-overflow-scrolling: touch; padding: 1rem 0; flex-grow: 1; min-height: 0; box-sizing: border-box; }
-    .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; overflow-y: auto; padding: 1.5rem; flex-grow: 1; min-height: 0; box-sizing: border-box; }
+    .carousel-view { display: flex; align-items: center; gap: 1.5rem; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scroll-behavior: smooth; scroll-padding: 0; -webkit-overflow-scrolling: touch; padding: 0.5rem 0; flex-grow: 1; min-height: 0; box-sizing: border-box; }
+    .grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; overflow-y: auto; padding: 1.5rem; flex-grow: 1; min-height: 0; box-sizing: border-box; } .grid-view .drink-card { height: 500px; }
     #menu-grid::-webkit-scrollbar { width: 8px; height: 8px; }
     #menu-grid::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); border-radius: 4px; }
     #menu-grid::-webkit-scrollbar-thumb { background-color: #d4af37; border-radius: 4px; border: 2px solid rgba(0,0,0,0.5); }
     #menu-grid { scrollbar-width: thin; scrollbar-color: #d4af37 rgba(0,0,0,0.5); }
-    .drink-card { perspective: 1500px; background-color: transparent; transition: opacity 0.3s, transform 0.3s; position: relative; height: 500px; content-visibility: auto; contain-intrinsic-size: 320px 500px; contain: layout style; }
-    .carousel-view .drink-card { flex: 0 0 82%; scroll-snap-align: center; margin-left: auto; margin-right: auto; }
+    .drink-card { perspective: 1500px; background-color: transparent; transition: opacity 0.3s, transform 0.3s; position: relative; height: 500px; max-height: 100%; }
+    .carousel-view .drink-card { flex: 0 0 82%; height: 100%; scroll-snap-align: center; scroll-snap-stop: always; margin-left: auto; margin-right: auto; }
     .carousel-view > .drink-card:first-child { margin-left: calc((100% - 82%) / 2); }
     .carousel-view > .drink-card:last-child { margin-right: calc((100% - 82%) / 2); }
     @media (min-width: 640px) { .carousel-view .drink-card { flex-basis: 58%; } .carousel-view > .drink-card:first-child { margin-left: calc((100% - 58%) / 2); } .carousel-view > .drink-card:last-child { margin-right: calc((100% - 58%) / 2); } }
