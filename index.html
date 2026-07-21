@@ -39,7 +39,7 @@
     #menu-grid::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); border-radius: 4px; }
     #menu-grid::-webkit-scrollbar-thumb { background-color: #d4af37; border-radius: 4px; border: 2px solid rgba(0,0,0,0.5); }
     #menu-grid { scrollbar-width: thin; scrollbar-color: #d4af37 rgba(0,0,0,0.5); }
-    .drink-card { perspective: 1500px; background-color: transparent; transition: opacity 0.3s, transform 0.3s; position: relative; height: var(--card-h, 500px); content-visibility: auto; contain-intrinsic-size: 320px var(--card-h, 500px); contain: layout style; }
+    .drink-card { perspective: 1500px; background-color: transparent; transition: opacity 0.3s, transform 0.3s; position: relative; height: var(--card-h, 500px); contain: layout style; }
     .carousel-view .drink-card { flex: 0 0 82%; flex-shrink: 0; scroll-snap-align: center; scroll-snap-stop: always; margin-left: auto; margin-right: auto; }
     .carousel-view > .drink-card:first-child { margin-left: calc((100% - 82%) / 2); }
     .carousel-view > .drink-card:last-child { margin-right: calc((100% - 82%) / 2); }
@@ -51,7 +51,7 @@
     .drink-card-front, .drink-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; flex-direction: column; overflow: hidden; border-radius: 0.75rem; }
     .drink-card-front { background-color: #241c14; background-image: radial-gradient(circle at 22% 18%, rgba(224,196,140,0.10), transparent 32%), radial-gradient(circle at 78% 82%, rgba(0,0,0,0.35), transparent 42%), repeating-linear-gradient(48deg, rgba(0,0,0,0.06) 0 3px, rgba(255,255,255,0.014) 3px 6px), repeating-linear-gradient(-42deg, rgba(0,0,0,0.05) 0 3px, rgba(255,255,255,0.012) 3px 6px), linear-gradient(150deg, #2b2117 0%, #14100a 100%); border: 2px solid #2fa79b; box-shadow: inset 0 0 34px rgba(0,0,0,0.55), inset 0 0 3px rgba(47,167,155,0.35); }
     .card-header-front { position: relative; padding: 0.85rem 3.5rem 0.45rem 1.25rem; background: transparent; border-bottom: 1px solid rgba(212,175,55,0.15); flex-shrink: 0; }
-    .recipe-content { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; touch-action: pan-y; padding: 0.7rem 1.25rem 1.4rem; min-height: 0; display: flex; flex-direction: column; justify-content: flex-start; }
+    .recipe-content { flex-grow: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; padding: 0.7rem 1.25rem 1.4rem; min-height: 0; display: flex; flex-direction: column; justify-content: flex-start; }
     .recipe-content::-webkit-scrollbar { width: 4px; }
     .recipe-content::-webkit-scrollbar-thumb { background-color: #d4af37; border-radius: 4px; }
     .pc-frame { position: absolute; inset: 9px; border: 1.5px solid rgba(212,175,55,0.55); border-radius: 0.5rem; pointer-events: none; z-index: 1; }
@@ -177,7 +177,7 @@
     .pc-joker .pc-watermark{font-size:8rem;}
     .pc-name{color:#7a5218;font-weight:700;}
     .pc-rule{background:linear-gradient(to right,transparent,rgba(122,82,24,0.6),transparent);}
-        .pc-pours{overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;max-height:300px;padding:0 0.2rem;}
+        .pc-pours{overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:300px;padding:0 0.2rem;}
     .pc-pours .pour-slot-label{color:#7a5218;font-family:'Cinzel',serif;font-size:0.78rem;letter-spacing:0.1em;text-transform:uppercase;display:block;margin-top:0.6rem;}
     .pc-pours .pour-group:first-child .pour-slot-label{margin-top:0;}
     .pc-pours .pour-pick-list{list-style:none;padding:0;margin:0.25rem 0 0;}
@@ -232,7 +232,7 @@
         <button id="action-favorites-btn" class="footer-btn"><i class="fas fa-heart"></i><span>Faves</span></button>
         <button id="action-view-btn" class="footer-btn"><i class="fas fa-table-cells-large"></i><span>Grid</span></button>
         <button id="action-stock-btn" class="footer-btn"><i class="fas fa-wine-bottle"></i><span>Stock</span></button>
-        <button id="story-view-btn" class="footer-btn"><i class="fas fa-fire"></i><span>Story</span></button>
+        <button id="story-view-btn" class="footer-btn"><i class="fas fa-whiskey-glass"></i><span>Pours</span></button>
     </div>
     <div id="spirit-bar" class="spirit-bar"></div>
     <main><div id="menu-grid" class="carousel-view"></div></main>
