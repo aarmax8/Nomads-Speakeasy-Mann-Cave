@@ -221,10 +221,12 @@
     .mc-outer{position:relative;width:120px;height:172px;perspective:700px;}
     .mc-inner{position:relative;width:100%;height:100%;transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);transform-style:preserve-3d;-webkit-transform-style:preserve-3d;}
     .mc-outer.is-flipped .mc-inner{transform:rotateY(180deg);}
-    .mc-face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:0.4rem;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,0.55);}
+    .mc-face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:0.4rem;overflow:hidden;box-shadow:0 4px 10px rgba(0,0,0,0.55);transition:visibility 0s linear 0.25s;}
     .mc-face *{-webkit-backface-visibility:hidden;backface-visibility:hidden;}
-    .mc-back{border:1.5px solid #b45309;}
-    .mc-front{transform:rotateY(180deg);background:linear-gradient(150deg,#2b2117 0%,#14100a 100%);border:1.5px solid #d4af37;padding:0.34rem 0.32rem;display:flex;flex-direction:column;}
+    .mc-back{border:1.5px solid #b45309;visibility:visible;}
+    .mc-outer.is-flipped .mc-back{visibility:hidden;}
+    .mc-front{transform:rotateY(180deg);background:linear-gradient(150deg,#2b2117 0%,#14100a 100%);border:1.5px solid #d4af37;padding:0.34rem 0.32rem;display:flex;flex-direction:column;visibility:hidden;}
+    .mc-outer.is-flipped .mc-front{visibility:visible;}
     .mc-corner{position:absolute;top:5px;left:6px;font-family:'Cinzel',serif;font-weight:700;line-height:1;z-index:2;color:#1d1a14;}
     .mc-corner.is-red{color:#b22d25;}
     .mc-corner .r{display:block;font-size:0.9rem;}
@@ -236,7 +238,7 @@
     .mc-outer.is-winner .mc-back{box-shadow:0 0 0 2px #e2703a, 0 4px 10px rgba(226,112,58,0.5);cursor:pointer;}
     .mc-outer:not(.is-winner){opacity:0.5;}
     .mc-flip-badge{position:absolute;bottom:3px;right:4px;font-size:0.66rem;color:#e2703a;z-index:3;filter:drop-shadow(0 1px 1px rgba(0,0,0,0.6));}
-    .mc-spirit{position:absolute;top:5px;right:6px;z-index:2;font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:0.6rem;letter-spacing:0.02em;text-align:right;text-shadow:0 1px 1px rgba(255,255,255,0.4);}
+    .mc-spirit{position:absolute;top:5px;right:6px;z-index:2;font-family:'Roboto Condensed',sans-serif;font-weight:700;font-size:0.62rem;letter-spacing:0.02em;text-align:right;color:#7a5218;}
     .mc-front-name{font-family:'Playfair Display',serif;font-style:italic;font-weight:600;font-size:0.82rem;color:#f0d38a;text-align:center;line-height:1.15;margin-bottom:0.28rem;flex-shrink:0;}
     .mc-front-list{list-style:none;padding:0;margin:0;overflow-y:auto;flex:1;}
     .mc-front-list li{font-family:'Cormorant Garamond',serif;font-size:0.74rem;line-height:1.22;color:#e5e7eb;border-bottom:1px dashed rgba(212,175,55,0.15);padding:0.1rem 0;}
@@ -513,7 +515,7 @@ function drawReading(){ const el=document.getElementById('reading-content');
  const hand=bestFive(dealt); hand.sort((a,b)=>b.v-a.v);
  const res=evaluatePoker(hand);
  const opts=res.group.slice().sort((a,b)=>b.v-a.v);
- const mini=(c,isWinner)=>{ const redCls=c.red?' is-red':''; const pts=RANK_PIPS[c.rank]; const pipHTML=pts?pts.map(p=>'<span class="mc-pip" style="left:'+p[0]+'%;top:'+p[1]+'%">'+c.suit+'</span>').join(''):'<span class="mc-pip" style="left:50%;top:50%;font-size:1.7rem;opacity:0.7">'+c.suit+'</span>'; const frontList=c.d.recipe.slice(0,8).map(l=>'<li>'+l+'</li>').join(''); const fam=c.d.families&&c.d.families[0]; const famLabel=fam?(SPIRIT_LABEL[fam]||fam):''; const famColor=fam&&FAMILY_ICON[fam]?FAMILY_ICON[fam][1]:'#7a5218'; const spiritHTML=famLabel?'<div class="mc-spirit" style="color:'+famColor+'">'+famLabel+'</div>':''; return '<div class="rd-slot"><div class="mc-outer'+(isWinner?' is-winner':'')+'"><div class="mc-inner"><div class="mc-face mc-back"'+agedBack(c.d.name)+'><div class="mc-corner'+redCls+'"><span class="r">'+c.rank+'</span><span class="s">'+c.suit+'</span></div>'+spiritHTML+'<div class="mc-pipwrap">'+pipHTML+'</div>'+(isWinner?'<i class="fas fa-rotate mc-flip-badge"></i>':'')+'<div class="mc-name">'+c.d.name+'</div></div><div class="mc-face mc-front"><div class="mc-front-name">'+c.d.name+'</div><ul class="mc-front-list">'+frontList+'</ul></div></div></div></div>'; };
+ const mini=(c,isWinner)=>{ const redCls=c.red?' is-red':''; const pts=RANK_PIPS[c.rank]; const pipHTML=pts?pts.map(p=>'<span class="mc-pip" style="left:'+p[0]+'%;top:'+p[1]+'%">'+c.suit+'</span>').join(''):'<span class="mc-pip" style="left:50%;top:50%;font-size:1.7rem;opacity:0.7">'+c.suit+'</span>'; const frontList=c.d.recipe.slice(0,8).map(l=>'<li>'+l+'</li>').join(''); const fam=c.d.families&&c.d.families[0]; const famLabel=fam?(SPIRIT_LABEL[fam]||fam):''; const spiritHTML=famLabel?'<div class="mc-spirit">'+famLabel+'</div>':''; return '<div class="rd-slot"><div class="mc-outer'+(isWinner?' is-winner':'')+'"><div class="mc-inner"><div class="mc-face mc-back"'+agedBack(c.d.name)+'><div class="mc-corner'+redCls+'"><span class="r">'+c.rank+'</span><span class="s">'+c.suit+'</span></div>'+spiritHTML+'<div class="mc-pipwrap">'+pipHTML+'</div>'+(isWinner?'<i class="fas fa-rotate mc-flip-badge"></i>':'')+'<div class="mc-name">'+c.d.name+'</div></div><div class="mc-face mc-front"><div class="mc-front-name">'+c.d.name+'</div><ul class="mc-front-list">'+frontList+'</ul></div></div></div></div>'; };
  const optBtn=c=>'<button class="rd-pick" data-jump="'+c.d.name+'"><span class="rd-pick-tag'+(c.red?' is-red':'')+'">'+c.rank+c.suit+'</span><span class="rd-pick-name">'+c.d.name+'</span><i class="fas fa-chevron-right"></i></button>';
  const label=opts.length>1?'Choose your pour:':'The hand pours:';
  const winnerNames=new Set(res.group.map(g=>g.d.name)); el.innerHTML='<div class="rd-spread rd-deal">'+hand.map(c=>mini(c,winnerNames.has(c.d.name))).join('')+'</div><div class="rd-hand">'+res.name+'</div><div class="rd-flavor">'+res.line+'</div><div class="rd-choose-label">'+label+'</div><div class="rd-options">'+opts.map(optBtn).join('')+'</div>'; }
