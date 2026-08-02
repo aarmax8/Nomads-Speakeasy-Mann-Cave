@@ -1,25 +1,40 @@
 # Nomads Mann Cave
 
-A single-file cocktail app. Two rooms — **The Cellar** (speakeasy, top-shelf pours) and **The Mann Cave** (dive bar, well spirits). Every card is double-sided, so one flip swaps the same drink between premium and well versions. Filter by ingredient, mark what's behind your bar, and the deck only stops on drinks you can actually make.
+A mobile-first cocktail menu app with two rooms — The Cellar and The Mann Cave. It runs as a browser app and saves your favorites, bar stock, and any uploaded art on your device, so it works without accounts or a backend.
 
-Everything runs in the browser. Your bar stock and any art you upload are saved on your phone — no accounts, no server.
+## What the app does
+
+- Presents a card-based menu with double-sided drink cards
+- Lets you flip between premium and well versions of the same drink
+- Supports filtering by category, ingredient, glass type, favorites, and search
+- Tracks what’s actually behind your bar so the deck can suggest drinks you can make
+- Includes a favorites view, a stock view, a splash screen, a sound toggle, and a QR-based menu card
+- Supports optional art for each drink, either from the repo or uploaded directly from your phone
 
 ## Put it online (GitHub Pages)
 
-1. Create a new GitHub repository (public), e.g. `mann-cave`.
+1. Create a new GitHub repository (public), for example `mann-cave`.
 2. Upload these files to the repo root:
    - `index.html`
    - `manifest.json`
    - `apple-touch-icon.png`
    - `icon-512.png`
-3. Repo **Settings → Pages** → Source: **Deploy from a branch** → branch `main`, folder `/root` → **Save**.
-4. Wait ~1 minute. Your app is live at `https://YOURNAME.github.io/mann-cave/`.
+3. Open the repository’s Settings → Pages.
+4. Set Source to Deploy from a branch, choose `main`, and use the `/root` folder.
+5. Save the settings and wait a minute or two for the site to publish.
 
-## Add your David Mann art
+## Install it on your iPhone
 
-The Mann Cave side of each card looks for an image in an `images/` folder, by drink name. Create a folder called `images` in the repo and drop your scans in, named exactly like this (`.jpg`, `.jpeg`, `.png`, or `.webp` all work):
+1. Open the Pages URL in Safari.
+2. Tap the Share button.
+3. Choose Add to Home Screen.
+4. Launch the app from the home-screen icon for the full-screen experience.
 
-```
+## Add art
+
+If you want custom art, place image files in an `images/` folder in the repo and name them by drink slug. For example:
+
+```text
 images/old-fashioned.jpg
 images/manhattan.jpg
 images/whiskey-sour.jpg
@@ -34,14 +49,23 @@ images/dark-n-stormy.jpg
 images/paloma.jpg
 ```
 
-Each frame fills automatically once its file is in the repo. You can also tap **Add art** on any card to load an image straight from your phone — that one is saved on-device and overrides the repo file. Tap **Replace** or the trash icon to change it.
-
-## Install it on your iPhone (runs like an app)
-
-1. Open the Pages URL in **Safari**.
-2. Tap the **Share** button → **Add to Home Screen** → **Add**.
-3. Launch it from the home-screen icon — it opens full-screen with no browser bars.
+The app will use those files automatically when present. You can also tap Add art on any card to upload an image from your phone; that version overrides the repo image and is stored locally on the device.
 
 ## Editing the menu
 
-All drinks live in the `DRINKS` array near the top of the `<script>` in `index.html`. Ingredients for filtering and stock live in `INGREDIENTS` right above it. To add a drink, copy one entry, change the fields, and list its core ingredients in `core` (using ids from `INGREDIENTS`). To add a brand-new ingredient, add it to `INGREDIENTS` first, then reference its `id`.
+All drinks live in the `DRINKS` array near the top of the `<script>` in `index.html`. Ingredients for filtering and stock are defined in `INGREDIENTS` just above it.
+
+To add a drink:
+- Copy an existing drink object
+- Update its fields
+- Add its required ingredients to the `core` array using ids from `INGREDIENTS`
+
+To add a new ingredient:
+- Add it to `INGREDIENTS`
+- Then reference its `id` in the relevant drinks
+
+## Notes
+
+- Everything runs in the browser.
+- Favorites, bar stock, and local uploads are stored in browser storage on the device.
+- Clearing browser data will reset those saved preferences.
