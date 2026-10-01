@@ -2,117 +2,662 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nomads Bar Menu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nomads Mann Cave</title>
+    
+    <!-- iOS & PWA Setup -->
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1a1a1a">
+
+    <!-- Fonts, Icons, and QR Library -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        urbane: '#44433d',
+                        shoji: '#e6dfd3',
+                        charcoal: '#1a1a1a',
+                        brass: '#b5a642',
+                        'brass-dark': '#8a7e30',
+                        darkbg: '#0a0a0a',
+                        cardbg: '#22211e'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a;
-            color: #f4f4f4;
-            margin: 0;
-            padding: 20px;
+            background-color: theme('colors.darkbg');
+            color: theme('colors.shoji');
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
         }
-        .menu-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background-color: #2a2a2a;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+
+        /* Splash Screen */
+        #splash {
+            transition: opacity 0.6s ease-out, visibility 0.6s;
         }
-        h1 {
-            text-align: center;
-            color: #e0a96d;
-            font-size: 2.5em;
-            margin-bottom: 5px;
+
+        /* 3D Flip Card Implementation */
+        .perspective-1000 { perspective: 1000px; }
+        .transform-style-3d { transform-style: preserve-3d; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        
+        .drink-card-inner {
+            transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+            position: relative;
+            width: 100%;
+            height: 100%;
         }
-        .creator-tag {
-            text-align: center;
-            font-style: italic;
-            color: #888;
-            margin-bottom: 30px;
-            font-size: 0.9em;
+        
+        .drink-card.flipped .drink-card-inner {
+            transform: rotateY(180deg);
         }
-        h2 {
-            color: #dddddd;
-            border-bottom: 2px solid #e0a96d;
-            padding-bottom: 5px;
-            margin-top: 30px;
-        }
-        .menu-item {
+
+        .card-side {
+            backface-visibility: hidden;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, theme('colors.cardbg'), theme('colors.charcoal'));
+            border: 1px solid rgba(181, 166, 66, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
             display: flex;
-            justify-content: space-between;
-            margin: 15px 0;
+            flex-direction: column;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
         }
-        .item-name {
-            font-weight: bold;
-            font-size: 1.1em;
+
+        .card-back {
+            transform: rotateY(180deg);
+            border-color: rgba(230, 223, 211, 0.2); /* Shoji white subtle border for Well */
         }
-        .item-price {
-            color: #e0a96d;
-            font-weight: bold;
+
+        .card-image-container {
+            position: relative;
+            height: 200px;
+            width: 100%;
+            background-color: theme('colors.charcoal');
         }
-        .item-desc {
-            color: #aaaaaa;
-            font-size: 0.9em;
-            margin-top: 5px;
+
+        .card-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.8;
         }
+
+        .card-overlay-btn {
+            position: absolute;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            color: theme('colors.brass');
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(181, 166, 66, 0.5);
+        }
+        .card-overlay-btn:active { transform: scale(0.9); }
+        .card-overlay-btn:hover { background: rgba(0,0,0,0.8); }
+
+        .btn-upload { top: 10px; left: 10px; }
+        .btn-fav { top: 10px; right: 10px; }
+        .btn-flip { bottom: -18px; right: 20px; z-index: 10; background: theme('colors.urbane'); }
+
+        .fav-active { color: #ef4444; border-color: #ef4444; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: theme('colors.darkbg'); }
+        ::-webkit-scrollbar-thumb { background: theme('colors.urbane'); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: theme('colors.brass'); }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body>
+<body class="flex flex-col h-screen">
 
-<div class="menu-container">
-    <h1>Nomads Bar</h1>
-    <div class="creator-tag">Created by AarMax8</div>
-
-    <h2>Craft Cocktails</h2>
-    <div class="menu-item">
-        <div>
-            <div class="item-name">The Nomad Old Fashioned</div>
-            <div class="item-desc">Bourbon, smoked bitters, orange peel, agave</div>
-        </div>
-        <div class="item-price">$14</div>
-    </div>
-    <div class="menu-item">
-        <div>
-            <div class="item-name">Desert Mirage</div>
-            <div class="item-desc">Tequila, jalapeño, lime, pineapple juice, tajin rim</div>
-        </div>
-        <div class="item-price">$13</div>
+    <div id="splash" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-charcoal">
+        <h1 class="font-serif text-5xl tracking-[0.2em] text-brass uppercase mb-4 text-center">Nomads</h1>
+        <p class="font-serif italic text-shoji/60 tracking-widest text-lg">The Mann Cave</p>
     </div>
 
-    <h2>Draft Beer</h2>
-    <div class="menu-item">
-        <div>
-            <div class="item-name">Wanderer's IPA</div>
-            <div class="item-desc">Local craft IPA with citrus notes</div>
+    <header class="bg-urbane border-b-2 border-brass/50 sticky top-0 z-40 px-4 py-3 shadow-lg">
+        <div class="flex justify-between items-center mb-3">
+            <div class="flex flex-col">
+                <h1 class="font-serif text-2xl font-bold text-brass tracking-widest uppercase">Nomads</h1>
+            </div>
+            <div class="flex gap-3">
+                <button id="btn-sound" onclick="toggleSound()" class="p-2 rounded-full border border-brass/30 text-brass hover:bg-brass/10 transition">
+                    <i class="ph ph-speaker-high text-xl" id="icon-sound"></i>
+                </button>
+                <button onclick="openQRModal()" class="p-2 rounded-full border border-brass/30 text-brass hover:bg-brass/10 transition">
+                    <i class="ph ph-qr-code text-xl"></i>
+                </button>
+            </div>
         </div>
-        <div class="item-price">$8</div>
-    </div>
-    <div class="menu-item">
-        <div>
-            <div class="item-name">Midnight Stout</div>
-            <div class="item-desc">Rich dark stout with chocolate undertones</div>
+        
+        <!-- Room Toggle -->
+        <div class="flex bg-charcoal rounded-lg p-1 border border-brass/20">
+            <button onclick="switchRoom('cave')" id="tab-cave" class="flex-1 py-2 text-sm font-semibold rounded-md transition-all text-charcoal bg-brass shadow">
+                The Mann Cave
+            </button>
+            <button onclick="switchRoom('cellar')" id="tab-cellar" class="flex-1 py-2 text-sm font-semibold rounded-md transition-all text-shoji/60 hover:text-shoji">
+                The Cellar (Stock)
+            </button>
         </div>
-        <div class="item-price">$9</div>
+    </header>
+
+    <main id="view-cave" class="flex-1 overflow-y-auto p-4 pb-24">
+        
+        <!-- Filters & Search -->
+        <div class="mb-6 space-y-3">
+            <div class="relative">
+                <i class="ph ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-brass text-lg"></i>
+                <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Search drinks, ingredients..." 
+                    class="w-full bg-cardbg border border-brass/30 rounded-xl py-3 pl-10 pr-4 text-shoji placeholder-shoji/40 focus:outline-none focus:border-brass transition">
+            </div>
+            
+            <div class="flex gap-2 overflow-x-auto hide-scroll pb-2" id="filter-categories">
+                <button onclick="setCategory('All')" class="filter-cat-btn active whitespace-nowrap px-4 py-1.5 rounded-full border border-brass bg-brass text-charcoal text-sm font-semibold transition">All Drinks</button>
+                <button onclick="setCategory('Favorites')" class="filter-cat-btn whitespace-nowrap px-4 py-1.5 rounded-full border border-brass/50 text-shoji hover:border-brass text-sm transition flex gap-1 items-center"><i class="ph-fill ph-heart text-red-500"></i> Favorites</button>
+                <button onclick="setCategory('Can Make')" class="filter-cat-btn whitespace-nowrap px-4 py-1.5 rounded-full border border-brass/50 text-shoji hover:border-brass text-sm transition flex gap-1 items-center"><i class="ph-fill ph-check-circle text-green-500"></i> Can Make</button>
+                <!-- JS injects dynamic categories here -->
+            </div>
+        </div>
+
+        <!-- Drink Grid -->
+        <div id="drink-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-10">
+            <!-- JS injects cards here -->
+        </div>
+    </main>
+
+    <main id="view-cellar" class="hidden flex-1 overflow-y-auto p-4 pb-24 bg-darkbg">
+        <div class="bg-cardbg rounded-xl border border-brass/30 p-5 shadow-xl mb-6 border-l-4 border-l-brass">
+            <h2 class="font-serif text-xl text-brass mb-2">Bar Inventory</h2>
+            <p class="text-sm text-shoji/70 italic">Select the ingredients you currently have in stock. The Mann Cave will suggest drinks you can make.</p>
+        </div>
+
+        <div class="mb-4">
+            <input type="text" id="stockSearchInput" oninput="renderCellar()" placeholder="Search cellar..." 
+                class="w-full bg-charcoal border border-brass/30 rounded-xl py-2 px-4 text-shoji focus:outline-none focus:border-brass">
+        </div>
+
+        <div id="stock-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <!-- JS injects stock toggles here -->
+        </div>
+    </main>
+
+    <!-- QR Modal -->
+    <div id="qr-modal" class="fixed inset-0 bg-black/90 z-[100] hidden flex-col items-center justify-center p-6 opacity-0 transition-opacity duration-300">
+        <div class="bg-cardbg border-2 border-brass rounded-2xl p-8 max-w-sm w-full relative flex flex-col items-center shadow-2xl">
+            <button onclick="closeQRModal()" class="absolute top-3 right-3 text-shoji hover:text-brass text-2xl">
+                <i class="ph ph-x"></i>
+            </button>
+            <h2 class="font-serif text-2xl text-brass mb-6 text-center uppercase tracking-widest">Share Menu</h2>
+            <div class="bg-white p-4 rounded-xl mb-6">
+                <canvas id="qr-canvas"></canvas>
+            </div>
+            <p class="text-center text-sm text-shoji/70 italic">Scan to open the Nomads Mann Cave on your device.</p>
+        </div>
     </div>
 
-    <h2>Bar Bites</h2>
-    <div class="menu-item">
-        <div>
-            <div class="item-name">Truffle Fries</div>
-            <div class="item-desc">Crispy fries tossed in truffle oil and parmesan</div>
-        </div>
-        <div class="item-price">$10</div>
-    </div>
-    <div class="menu-item">
-        <div>
-            <div class="item-name">Nomad Sliders</div>
-            <div class="item-desc">Three beef sliders with cheddar and house sauce</div>
-        </div>
-        <div class="item-price">$15</div>
-    </div>
-</div>
+    <!-- Hidden File Input for Custom Art -->
+    <input type="file" id="art-uploader" accept="image/*" class="hidden" onchange="handleArtUpload(event)">
 
+    <script>
+        // --- MASTER DATABASE ---
+        // Defined precisely as requested in the README
+
+        const INGREDIENTS = [
+            { id: 'woodford', name: 'Woodford Reserve', category: 'Bourbon' },
+            { id: 'house-bourbon', name: 'House Bourbon', category: 'Bourbon' },
+            { id: 'four-roses', name: 'Four Roses Whiskey', category: 'Whiskey' },
+            { id: 'seagrams-7', name: 'Seagrams 7', category: 'Whiskey' },
+            { id: 'apricot-brandy', name: 'Apricot Brandy', category: 'Liqueur' },
+            { id: 'amaretto', name: 'Amaretto', category: 'Liqueur' },
+            { id: 'cognac', name: 'Cognac', category: 'Brandy' },
+            { id: 'rye', name: 'Rye Whiskey', category: 'Whiskey' },
+            { id: 'tequila-blanco', name: 'Tequila Blanco', category: 'Tequila' },
+            { id: 'bitters', name: 'Angostura Bitters', category: 'Bitters' },
+            { id: 'peychauds', name: 'Peychaud\'s Bitters', category: 'Bitters' },
+            { id: 'orange-bitters', name: 'Orange Bitters', category: 'Bitters' },
+            { id: 'simple', name: 'Simple Syrup', category: 'Mixer' },
+            { id: 'agave', name: 'Agave Nectar', category: 'Mixer' },
+            { id: 'lemon-lime', name: 'Lemon-Lime Soda', category: 'Mixer' },
+            { id: 'oj', name: 'Orange Juice', category: 'Mixer' },
+            { id: 'sour-mix', name: 'Fresh Sour Mix', category: 'Mixer' },
+            { id: 'lime', name: 'Fresh Lime Juice', category: 'Mixer' },
+            { id: 'pernod', name: 'Pernod (Rinse)', category: 'Liqueur' }
+        ];
+
+        const DRINKS = [
+            {
+                id: 'old-fashioned',
+                slug: 'old-fashioned',
+                name: 'Nomads Old Fashioned',
+                category: 'Bourbon',
+                glass: 'Rocks',
+                core: ['woodford', 'simple', 'bitters'],
+                premium: {
+                    desc: 'A robust, oak-forward classic.',
+                    ingredients: ['2 oz Woodford Reserve Double Oaked', '0.25 oz Simple Syrup', '3 dashes Angostura Bitters', 'Orange Peel'],
+                    recipe: 'Muddle simple syrup and bitters in a rocks glass. Add a large ice cube, pour in bourbon. Stir until chilled. Express orange peel oils over the drink and drop in.'
+                },
+                well: {
+                    desc: 'The timeless standard.',
+                    ingredients: ['2 oz House Bourbon', '0.25 oz Simple Syrup', '3 dashes Angostura Bitters', 'Orange Peel'],
+                    recipe: 'Build in glass over ice, stir, and garnish.'
+                }
+            },
+            {
+                id: 'seven-and-seven',
+                slug: 'seven-and-seven',
+                name: 'The 7 & 7 Classic',
+                category: 'Whiskey',
+                glass: 'Highball',
+                core: ['seagrams-7', 'lemon-lime'],
+                premium: {
+                    desc: 'Elevated with craft soda and a fresh citrus twist.',
+                    ingredients: ['1.5 oz Seagrams 7', 'Craft Lemon-Lime Soda', 'Lemon Twist'],
+                    recipe: 'Fill a highball glass with clear ice. Pour whiskey, top gently with craft soda. Garnish with a lemon twist.'
+                },
+                well: {
+                    desc: 'The crisp dive-bar favorite.',
+                    ingredients: ['1.5 oz Seagrams 7', 'Fountain Lemon-Lime Soda'],
+                    recipe: 'Fill a highball glass with ice, add whiskey, top with soda and stir.'
+                }
+            },
+            {
+                id: 'stone-sour',
+                slug: 'stone-sour',
+                name: 'Stone Sour',
+                category: 'Classic',
+                glass: 'Rocks',
+                core: ['apricot-brandy', 'oj', 'sour-mix'],
+                premium: {
+                    desc: 'Freshly squeezed citrus meets rich apricot.',
+                    ingredients: ['1.5 oz Premium Apricot Brandy', '1 oz Fresh Squeezed OJ', '1 oz House-made Sour Mix'],
+                    recipe: 'Combine all ingredients in a shaker with ice. Shake vigorously and double strain over a single large ice cube.'
+                },
+                well: {
+                    desc: 'Sweet and tart porch sipper.',
+                    ingredients: ['1.5 oz Apricot Brandy', '1 oz Orange Juice', '1 oz Sour Mix'],
+                    recipe: 'Shake all ingredients with ice and strain over fresh ice.'
+                }
+            },
+            {
+                id: 'french-connection',
+                slug: 'french-connection',
+                name: 'The French Connection',
+                category: 'Classic',
+                glass: 'Snifter',
+                core: ['amaretto', 'cognac'],
+                premium: {
+                    desc: 'Silky smooth after-dinner indulgence.',
+                    ingredients: ['1.5 oz VSOP Cognac', '1 oz Premium Amaretto'],
+                    recipe: 'Pour cognac and amaretto into a warmed snifter glass. Swirl gently. Serve neat.'
+                },
+                well: {
+                    desc: 'Rich and warming.',
+                    ingredients: ['1.5 oz House Brandy', '1 oz Amaretto'],
+                    recipe: 'Build in a rocks glass or snifter. Serve neat.'
+                }
+            },
+            {
+                id: 'sazerac',
+                slug: 'sazerac',
+                name: 'Sazerac Twist',
+                category: 'Whiskey',
+                glass: 'Rocks',
+                core: ['four-roses', 'peychauds', 'simple', 'pernod'],
+                premium: {
+                    desc: 'Complex, herbal, and deeply aromatic.',
+                    ingredients: ['2 oz Four Roses Whiskey', '4 dashes Peychaud\'s Bitters', '1 Sugar Cube', 'Pernod Rinse', 'Lemon Peel'],
+                    recipe: 'Rinse a chilled rocks glass with Pernod, discard excess. In a mixing glass, muddle sugar and bitters, add whiskey and ice. Stir, strain into rinsed glass. Express lemon peel and discard.'
+                },
+                well: {
+                    desc: 'A rugged take on the New Orleans staple.',
+                    ingredients: ['2 oz Rye Whiskey', '4 dashes Peychaud\'s Bitters', '0.25 oz Simple Syrup', 'Pernod Rinse'],
+                    recipe: 'Rinse glass with Pernod. Stir whiskey, syrup, and bitters with ice. Strain into glass.'
+                }
+            }
+        ];
+
+        // --- STATE MANAGEMENT ---
+        let state = {
+            room: 'cave',
+            search: '',
+            category: 'All',
+            favorites: JSON.parse(localStorage.getItem('nomads_favorites') || '[]'),
+            stock: JSON.parse(localStorage.getItem('nomads_stock') || '[]'),
+            customArt: JSON.parse(localStorage.getItem('nomads_art') || '{}'),
+            sound: localStorage.getItem('nomads_sound') !== 'false'
+        };
+
+        let currentUploadId = null;
+
+        function init() {
+            // Splash screen sequence
+            setTimeout(() => {
+                document.getElementById('splash').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('splash').style.visibility = 'hidden';
+                }, 600);
+            }, 1200);
+
+            // Populate Category Filters dynamically
+            const categories = [...new Set(DRINKS.map(d => d.category))];
+            const filterContainer = document.getElementById('filter-categories');
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'filter-cat-btn whitespace-nowrap px-4 py-1.5 rounded-full border border-brass/50 text-shoji hover:border-brass text-sm transition';
+                btn.innerText = cat;
+                btn.onclick = () => setCategory(cat);
+                filterContainer.appendChild(btn);
+            });
+
+            updateSoundIcon();
+            renderCave();
+            renderCellar();
+        }
+
+        // Web Audio API for subtle, self-contained interaction sounds
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(type) {
+            if (!state.sound) return;
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            if (type === 'flip') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.1);
+            } else if (type === 'fav') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(600, audioCtx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.2);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            }
+        }
+
+        function toggleSound() {
+            state.sound = !state.sound;
+            localStorage.setItem('nomads_sound', state.sound);
+            updateSoundIcon();
+        }
+
+        function updateSoundIcon() {
+            const icon = document.getElementById('icon-sound');
+            icon.className = state.sound ? 'ph ph-speaker-high text-xl' : 'ph ph-speaker-slash text-xl opacity-50';
+        }
+
+        function switchRoom(room) {
+            state.room = room;
+            document.getElementById('view-cave').style.display = room === 'cave' ? 'block' : 'none';
+            document.getElementById('view-cellar').style.display = room === 'cellar' ? 'block' : 'none';
+            
+            // Tab styling
+            const caveBtn = document.getElementById('tab-cave');
+            const cellarBtn = document.getElementById('tab-cellar');
+            
+            if(room === 'cave') {
+                caveBtn.className = 'flex-1 py-2 text-sm font-semibold rounded-md transition-all text-charcoal bg-brass shadow';
+                cellarBtn.className = 'flex-1 py-2 text-sm font-semibold rounded-md transition-all text-shoji/60 hover:text-shoji bg-transparent';
+                renderCave(); // Re-render in case stock changed
+            } else {
+                cellarBtn.className = 'flex-1 py-2 text-sm font-semibold rounded-md transition-all text-charcoal bg-brass shadow';
+                caveBtn.className = 'flex-1 py-2 text-sm font-semibold rounded-md transition-all text-shoji/60 hover:text-shoji bg-transparent';
+            }
+        }
+
+        function setCategory(cat) {
+            state.category = cat;
+            document.querySelectorAll('.filter-cat-btn').forEach(btn => {
+                if(btn.innerText.includes(cat) || (cat==='Favorites' && btn.innerText.includes('Favorites')) || (cat==='Can Make' && btn.innerText.includes('Can Make'))) {
+                    btn.className = 'filter-cat-btn active whitespace-nowrap px-4 py-1.5 rounded-full border border-brass bg-brass text-charcoal text-sm font-semibold transition flex gap-1 items-center';
+                } else {
+                    btn.className = 'filter-cat-btn whitespace-nowrap px-4 py-1.5 rounded-full border border-brass/50 text-shoji hover:border-brass text-sm transition flex gap-1 items-center';
+                }
+            });
+            renderCave();
+        }
+
+        function applyFilters() {
+            state.search = document.getElementById('searchInput').value.toLowerCase();
+            renderCave();
+        }
+
+        function canMakeDrink(drink) {
+            // Returns true if all core ingredients are in state.stock
+            return drink.core.every(ingId => state.stock.includes(ingId));
+        }
+
+        function renderCave() {
+            const grid = document.getElementById('drink-grid');
+            grid.innerHTML = '';
+
+            let filtered = DRINKS.filter(drink => {
+                // Search match
+                const matchSearch = drink.name.toLowerCase().includes(state.search) || 
+                                    drink.premium.ingredients.join(' ').toLowerCase().includes(state.search);
+                
+                // Category match
+                let matchCat = false;
+                if (state.category === 'All') matchCat = true;
+                else if (state.category === 'Favorites') matchCat = state.favorites.includes(drink.id);
+                else if (state.category === 'Can Make') matchCat = canMakeDrink(drink);
+                else matchCat = drink.category === state.category;
+
+                return matchSearch && matchCat;
+            });
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `<div class="col-span-full text-center text-shoji/50 italic py-10">No drinks match your current criteria or bar stock.</div>`;
+                return;
+            }
+
+            filtered.forEach(drink => {
+                const isFav = state.favorites.includes(drink.id);
+                const artSrc = state.customArt[drink.id] || `images/${drink.slug}.jpg`;
+                // Fallback placeholder via placehold.co if repo image is missing
+                const fallbackSrc = `https://placehold.co/400x400/1a1a1a/b5a642?text=${encodeURIComponent(drink.name.split(' ').join('\n'))}`;
+
+                const cardHTML = `
+                    <div class="drink-card perspective-1000 h-[450px]" id="card-${drink.id}">
+                        <div class="drink-card-inner">
+                            <!-- FRONT: Premium -->
+                            <div class="card-side">
+                                <div class="card-image-container">
+                                    <img src="${artSrc}" onerror="this.onerror=null;this.src='${fallbackSrc}';" class="card-image" alt="${drink.name}">
+                                    <button class="card-overlay-btn btn-upload" onclick="triggerUpload('${drink.id}', event)" title="Upload Custom Art">
+                                        <i class="ph ph-image"></i>
+                                    </button>
+                                    <button class="card-overlay-btn btn-fav ${isFav ? 'fav-active' : ''}" onclick="toggleFav('${drink.id}', event)">
+                                        <i class="${isFav ? 'ph-fill' : 'ph'} ph-heart"></i>
+                                    </button>
+                                </div>
+                                <div class="p-4 flex-1 flex flex-col">
+                                    <div class="flex justify-between items-start mb-1">
+                                        <h3 class="font-serif text-xl text-brass font-bold leading-tight">${drink.name}</h3>
+                                        <span class="text-xs border border-brass/50 text-brass px-2 py-0.5 rounded-full uppercase tracking-wider">Premium</span>
+                                    </div>
+                                    <p class="text-xs text-shoji/60 mb-3 font-semibold uppercase tracking-widest">${drink.category} • ${drink.glass} Glass</p>
+                                    <p class="text-sm italic text-shoji/80 mb-3 border-l-2 border-brass pl-2">${drink.premium.desc}</p>
+                                    <div class="flex-1 overflow-y-auto hide-scroll text-sm space-y-1 text-shoji">
+                                        ${drink.premium.ingredients.map(i => `<div class="flex gap-2"><i class="ph-fill ph-drop text-brass/70 mt-0.5 text-xs"></i><span>${i}</span></div>`).join('')}
+                                    </div>
+                                </div>
+                                <button class="absolute bottom-4 right-4 p-2 bg-charcoal rounded-full border border-brass text-brass shadow-lg z-10 hover:bg-brass hover:text-charcoal transition" onclick="flipCard('${drink.id}')">
+                                    <i class="ph ph-arrows-left-right text-xl"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- BACK: Well -->
+                            <div class="card-side card-back bg-gradient-to-br from-charcoal to-darkbg">
+                                <div class="p-5 flex-1 flex flex-col relative h-full">
+                                    <div class="flex justify-between items-start mb-2 border-b border-brass/30 pb-3">
+                                        <h3 class="font-serif text-xl text-shoji font-bold leading-tight">${drink.name}</h3>
+                                        <span class="text-xs border border-shoji/50 text-shoji px-2 py-0.5 rounded-full uppercase tracking-wider">Well</span>
+                                    </div>
+                                    <p class="text-sm italic text-shoji/70 mb-4">${drink.well.desc}</p>
+                                    
+                                    <h4 class="text-xs text-brass uppercase tracking-widest font-bold mb-2">Well Ingredients</h4>
+                                    <ul class="text-sm space-y-1 text-shoji/90 mb-5 pl-1">
+                                        ${drink.well.ingredients.map(i => `<li>• ${i}</li>`).join('')}
+                                    </ul>
+
+                                    <h4 class="text-xs text-brass uppercase tracking-widest font-bold mb-2">Preparation</h4>
+                                    <p class="text-sm text-shoji/80 leading-relaxed overflow-y-auto hide-scroll flex-1">${drink.well.recipe}</p>
+                                    
+                                    <button class="absolute bottom-4 right-4 p-2 bg-urbane rounded-full border border-shoji/50 text-shoji shadow-lg z-10 hover:bg-shoji hover:text-charcoal transition" onclick="flipCard('${drink.id}')">
+                                        <i class="ph ph-arrow-u-up-left text-xl"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += cardHTML;
+            });
+        }
+
+        function renderCellar() {
+            const grid = document.getElementById('stock-grid');
+            const search = document.getElementById('stockSearchInput').value.toLowerCase();
+            grid.innerHTML = '';
+
+            const filteredIngs = INGREDIENTS.filter(ing => ing.name.toLowerCase().includes(search));
+
+            filteredIngs.forEach(ing => {
+                const inStock = state.stock.includes(ing.id);
+                const div = document.createElement('div');
+                div.className = `p-3 rounded-lg border cursor-pointer transition-all flex flex-col justify-center items-center text-center h-24 ${inStock ? 'bg-brass/20 border-brass text-brass' : 'bg-cardbg border-brass/20 text-shoji/60 hover:border-brass/50'}`;
+                div.onclick = () => toggleStock(ing.id);
+                div.innerHTML = `
+                    <i class="${inStock ? 'ph-fill ph-check-circle text-2xl mb-1' : 'ph ph-circle text-2xl mb-1 opacity-50'}"></i>
+                    <span class="text-xs font-semibold uppercase tracking-wider leading-tight">${ing.name}</span>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        function toggleStock(id) {
+            if (state.stock.includes(id)) {
+                state.stock = state.stock.filter(i => i !== id);
+            } else {
+                state.stock.push(id);
+            }
+            localStorage.setItem('nomads_stock', JSON.stringify(state.stock));
+            renderCellar();
+        }
+
+        function flipCard(id) {
+            playSound('flip');
+            const card = document.getElementById(`card-${id}`);
+            card.classList.toggle('flipped');
+        }
+
+        function toggleFav(id, event) {
+            event.stopPropagation();
+            playSound('fav');
+            if (state.favorites.includes(id)) {
+                state.favorites = state.favorites.filter(f => f !== id);
+            } else {
+                state.favorites.push(id);
+            }
+            localStorage.setItem('nomads_favorites', JSON.stringify(state.favorites));
+            
+            // Re-render immediately to update visual state globally
+            renderCave();
+        }
+
+        function triggerUpload(id, event) {
+            event.stopPropagation();
+            currentUploadId = id;
+            document.getElementById('art-uploader').click();
+        }
+
+        function handleArtUpload(event) {
+            const file = event.target.files[0];
+            if (!file || !currentUploadId) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Str = e.target.result;
+                state.customArt[currentUploadId] = base64Str;
+                localStorage.setItem('nomads_art', JSON.stringify(state.customArt));
+                renderCave(); // Refresh grid to show new image
+            };
+            reader.readAsDataURL(file);
+            event.target.value = ''; // Reset input
+        }
+
+        function openQRModal() {
+            const modal = document.getElementById('qr-modal');
+            modal.classList.remove('hidden');
+            // Small timeout to allow display:block to apply before animating opacity
+            setTimeout(() => {
+                modal.classList.remove('opacity-0');
+                modal.classList.add('opacity-100');
+                
+                // Generate QR code for the current URL
+                new QRious({
+                    element: document.getElementById('qr-canvas'),
+                    value: window.location.href,
+                    size: 250,
+                    background: '#ffffff',
+                    foreground: '#1a1a1a'
+                });
+            }, 10);
+        }
+
+        function closeQRModal() {
+            const modal = document.getElementById('qr-modal');
+            modal.classList.remove('opacity-100');
+            modal.classList.add('opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // Bootstrap the app
+        window.onload = init;
+    </script>
 </body>
 </html>
